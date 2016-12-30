@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="utf=8" />
+
+<title>Toroidal Spiral Tube</title>
+
+<style>
+body {
+  background-color : gray;
+  font-family: "Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif;
+}
+h1 {
+  font-size : 1.2em;
+}
+footer {
+  font-size : 0.7 em;
+  font-family: "Arial Rounded MT", "Helvetica Rounded", Arial, sans-serif;
+  font-style: italic;
+}
+</style>
+
+<script src="matrix.js"></script>
+<script src="tube.js"></script>
+        
+<script id="vertex" type="x-shader">
+   attribute vec4 vertexPosition;
+   attribute vec3 vertexNormal;
+   attribute vec2 vertexTexCoord;
+
+   varying vec4 color;
+
+   uniform mat4 ModelViewProjection;
+   uniform mat4 ModelViewMatrix;
+   uniform mat3 NormalMatrix;
+
+   uniform vec3 ambientLight;
+   uniform vec3 light0Color;
+   uniform vec3 light0Position;
+
+   uniform vec3 materialAmbient;
+   uniform vec3 materialDiffuse;
+   uniform vec3 materialSpecular;
+   uniform float materialShininess;
+
+   void main() {
+     gl_Position = ModelViewProjection*vertexPosition;
+
+     vec3 P = vec3(ModelViewMatrix * vertexPosition);
+     vec3 N = normalize(NormalMatrix * vertexNormal);
+     vec3 L = normalize(light0Position - P);
+
+     vec3 I_ambient = materialAmbient * ambientLight;
+     float cos_theta = dot(L,N);
+     vec3 diffuseScale = light0Color * max(0.0, cos_theta);
+     vec3 I_diffuse = materialDiffuse * diffuseScale;
+     vec3 I_specular = vec3(0.0, 0.0, 0.0);
+
+     if (cos_theta > 0.0) {
+       vec3 R = reflect(-L,N);
+       vec3 V = normalize(-P);
+       float cos_alpha = dot(R,V);
+       I_specular = materialSpecular * light0Color *
+         pow(max(0.0, cos_alpha), materialShininess);
+     }
+
+     color = vec4(I_ambient + I_diffuse + I_specular, 1.0);
+   }
+</script>
+
+<script id="fragment" type="x-shader">
+      precision mediump float;
+      varying vec4 color;
+      void main() {
+          gl_FragColor = color;
+      }
+</script>
+
+
+
+</head>
+<body onload="init(); display()">
+
+<h1>Toroidal Spiral Tube</h1>
+
+<canvas id="myCanvas" width="400" height="400"></canvas><br />
+Click and drag to rotate...<br>
+
+<hr>
+<footer>
+  Chris Willette<br />
+  October 27, 2016
+</footer>
+
+</body>
+</html>
