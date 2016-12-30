@@ -1,6 +1,6 @@
-Author: Chris Willette
+Chris Willette
 
-email: christopher.willette@gmail.com
+christopher.willette@gmail.com
 
   
 Description:
